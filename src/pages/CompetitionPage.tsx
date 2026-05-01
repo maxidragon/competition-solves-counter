@@ -129,6 +129,34 @@ export default function CompetitionPage() {
         return sortDir === "asc" ? cmp : -cmp;
     });
 
+    let currentRank = 1;
+    const competitorsWithRank = sortedCompetitors.map((person, index) => {
+        if (index > 0) {
+            const prev = sortedCompetitors[index - 1];
+            const prevCounts = solveCounts.get(prev.registrantId ?? -1) ?? { attempted: 0, completed: 0 };
+            const currCounts = solveCounts.get(person.registrantId ?? -1) ?? { attempted: 0, completed: 0 };
+            
+            let isTie = false;
+            switch (sortKey) {
+                case "name":
+                    isTie = person.name === prev.name;
+                    break;
+                case "events":
+                    isTie = (person.registration?.eventIds.length ?? 0) === (prev.registration?.eventIds.length ?? 0);
+                    break;
+                case "completed":
+                    isTie = currCounts.completed === prevCounts.completed;
+                    break;
+                case "attempted":
+                    isTie = currCounts.attempted === prevCounts.attempted;
+                    break;
+            }
+            if (!isTie) {
+                currentRank = index + 1;
+            }
+        }
+        return { person, rank: currentRank };
+    });
 
     return (
         <div className="min-h-screen px-4 py-8 max-w-6xl mx-auto">
@@ -188,7 +216,7 @@ export default function CompetitionPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedCompetitors.map((person, index) => {
+                            {competitorsWithRank.map(({ person, rank }) => {
                                 const counts = solveCounts.get(person.registrantId ?? -1);
                                 return (
                                     <tr
@@ -196,7 +224,7 @@ export default function CompetitionPage() {
                                         className="border-b border-border/40 hover:bg-surface-hover/50 transition-colors duration-100"
                                     >
                                         <td className="px-5 py-3 text-text-dim text-sm font-mono">
-                                            {index + 1}
+                                            {rank}
                                         </td>
                                         <td className="px-5 py-3">
                                             <span className="text-text font-medium">{person.name}</span>
