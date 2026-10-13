@@ -33,7 +33,7 @@ export interface WcifPerson {
   assignments: unknown[];
   personalBests: {
     eventId: string;
-    best: number;
+    value: number;
     type: string;
     worldRanking: number;
     continentalRanking: number;
@@ -42,7 +42,7 @@ export interface WcifPerson {
 }
 
 export interface WcifAttempt {
-  result: number;
+  value: number;
   reconstruction: string | null;
 }
 
@@ -56,10 +56,12 @@ export interface WcifResult {
 
 export interface WcifRound {
   id: string;
-  format: string;
+  /** Rounds forming a Dual Round with this one (including itself), if any. */
+  linkedRounds: string[] | null;
+  format: "1" | "2" | "3" | "5" | "a" | "m" | "h";
   timeLimit: unknown;
   cutoff: unknown;
-  advancementCondition: unknown;
+  participationRuleset: unknown;
   results: WcifResult[];
 }
 

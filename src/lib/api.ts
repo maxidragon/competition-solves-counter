@@ -32,12 +32,20 @@ export const fetchSearchCompetition = async (
   return data.result;
 };
 
+// Pinned to the v2 major version: `/wcif/latest` will move to v3, and the
+// unversioned `/wcif/public` still serves v1, which the WCA is deprecating.
+const WCIF_MAJOR_VERSION = 2;
+
 export const fetchWcif = async (competitionId: string): Promise<Wcif> => {
   const response = await fetch(
-    `${WCA_ORIGIN}/api/v0/competitions/${competitionId}/wcif/public`,
+    `${WCA_ORIGIN}/api/v0/competitions/${competitionId}/wcif/version/${WCIF_MAJOR_VERSION}`,
   );
   if (!response.ok) {
     throw new Error(`Failed to fetch WCIF: ${response.status}`);
   }
-  return response.json();
+  const wcif: Wcif = await response.json();
+  if (!wcif.formatVersion?.startsWith(`${WCIF_MAJOR_VERSION}.`)) {
+    throw new Error(`Unsupported WCIF format version: ${wcif.formatVersion}`);
+  }
+  return wcif;
 };
