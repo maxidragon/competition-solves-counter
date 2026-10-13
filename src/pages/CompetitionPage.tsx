@@ -83,10 +83,10 @@ export default function CompetitionPage() {
             for (const result of round.results) {
                 const existing = solveCounts.get(result.personId) ?? { attempted: 0, completed: 0 };
                 for (const attempt of result.attempts) {
-                    if (attempt.result !== 0) {
+                    if (attempt.value !== 0) {
                         existing.attempted++;
                     }
-                    if (attempt.result > 0) {
+                    if (attempt.value > 0) {
                         existing.completed++;
                     }
                 }
